@@ -3,6 +3,12 @@ package com.atakmap.android.traffic.plugin;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -280,17 +286,18 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
         intervalButton.setEnabled(on);
 
         if (!on) {
-            status.setText(R.string.off);
+            status.setText(state(R.string.state_off, R.color.state_off));
             return;
         }
 
         final long every = overlay.getIntervalMs() / 1000L;
-        final StringBuilder sb = new StringBuilder();
-        sb.append(pluginContext.getString(R.string.on_now)).append("\n");
+        final SpannableStringBuilder sb =
+                new SpannableStringBuilder(state(R.string.state_on, R.color.state_on));
+        sb.append("\n");
         if (overlay.isHoldingForScreen())
             sb.append("Holding while the screen is off; refreshes on wake.\n");
         else
-            sb.append("Refreshing every ").append(every).append("s.\n");
+            sb.append("Refreshing every ").append(String.valueOf(every)).append("s.\n");
 
         // "Last refresh" means the moment tiles actually changed, not the moment the
         // plugin asked for them. The difference only shows up when something is wrong —
@@ -299,7 +306,13 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
         if (!overlay.isFreshnessKnown()) {
             sb.append("This source keeps no cache, so freshness cannot be shown.");
         } else if (changed > 0) {
-            sb.append("Last refresh ").append(clock.format(new Date(changed)));
+            // Say why the tiles are current when the reason is the operator picking the
+            // device up. Otherwise all they see is a recent time and have to work it out.
+            if (overlay.isFreshFromWake())
+                sb.append(pluginContext.getString(R.string.woke_fmt,
+                        clock.format(new Date(changed))));
+            else
+                sb.append("Last refresh ").append(clock.format(new Date(changed)));
             if (overlay.isStale())
                 sb.append("\nNo new tiles since then — check the network.");
         } else if (overlay.isHoldingForScreen()) {
@@ -307,7 +320,25 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
         } else {
             sb.append("Waiting for the first tiles…");
         }
-        status.setText(sb.toString());
+        status.setText(sb);
+    }
+
+    /**
+     * The state word, in its colour and larger than the detail beneath it.
+     *
+     * ON and OFF are what the operator reads first and often the only thing they read, so
+     * the word carries the answer by itself rather than needing the sentence after it.
+     */
+    private CharSequence state(int wordRes, int colorRes) {
+        final SpannableStringBuilder s =
+                new SpannableStringBuilder(pluginContext.getString(wordRes));
+        final int end = s.length();
+        s.setSpan(new ForegroundColorSpan(
+                        pluginContext.getResources().getColor(colorRes)),
+                0, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        s.setSpan(new StyleSpan(Typeface.BOLD), 0, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        s.setSpan(new RelativeSizeSpan(1.4f), 0, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return s;
     }
 
     private void say(String message) {
