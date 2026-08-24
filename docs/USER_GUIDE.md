@@ -60,90 +60,96 @@ map stays current whether or not anyone is touching it.
 
 ### Step 1 — Open the plugin
 
-Traffic appears on the ATAK toolbar, and in the Tools list under the hamburger
-menu at the top right. The icon is a traffic light over a road.
+Traffic appears in the Tools list under the hamburger menu at the top right, and
+on the ATAK toolbar. The icon is a traffic light over a road.
 
 ![Traffic in the Tools list](screenshots/1_plugin_in_tools_list.png)
 
 ### Step 2 — The Traffic pane
 
-Three controls and a status line. The state is the first thing on it — **OFF**
-in red, **ON** in green — so you can tell at a glance without reading. Everything
-is off until you turn it on, so opening the pane changes nothing on the map.
+Three controls and a status line. The state is the first thing on it — **OFF** in
+red — so you can tell at a glance without reading. Refresh and Interval are
+greyed out until the overlay is on, and opening the pane changes nothing on the
+map.
 
 ![The Traffic pane, off](screenshots/2_pane_off.png)
 
 ### Step 3 — Turn it on
 
-Tap **Turn On Traffic Overlay**. Traffic appears over your base map within a
-few seconds — green where it is moving, amber and red where it is not.
+Tap **Turn On Traffic Overlay**. Traffic appears over your base map within a few
+seconds — green where it is moving, amber and red where it is not.
 
 ![Traffic drawn over the base map](screenshots/3_overlay_on.png)
 
 ### Step 4 — Your base map is still there
 
-The overlay is transparent apart from the roads themselves. Imagery, terrain and
-labels stay readable underneath, which is the whole point — you are looking at
-traffic *in context*, not at a traffic map.
+The overlay is transparent apart from the roads themselves, so your own map stays
+readable underneath — streets, water, parks, labels. That is the whole point: you
+are looking at traffic *in context*, not at a traffic map.
 
-![Traffic over satellite imagery](screenshots/4_over_imagery.png)
+The status now reads **ON** in green, with the interval and the time tiles last
+arrived.
 
-### Step 5 — Leave it alone
+![Base map readable under the traffic](screenshots/4_base_map_underneath.png)
 
-This is the part that matters. Put the device down and do not touch it. The
-status line keeps updating on its own, and so does the traffic.
+### Step 5 — Refresh right now
 
-![Status line after several unattended refreshes](screenshots/5_status_refreshing.png)
+The overlay refreshes on its own, but tap **Refresh now** if you want the current
+picture immediately rather than waiting out the interval. The timestamp updates a
+few seconds later, once the new tiles have actually arrived.
 
-The status line tells you three things:
-
-- **that the overlay is on**, and which source is drawing;
-- **how often it refreshes**;
-- **when tiles last actually arrived** — not when the plugin last asked for
-  them. If the network drops, this timestamp stops moving and a warning appears.
-  That is the difference between "live" and "a picture of five minutes ago".
+![Refresh now](screenshots/5_refresh_now.png)
 
 ### Step 6 — Change how often it refreshes
 
-Tap **Interval** and pick anything from 15 seconds to 10 minutes. 60 seconds is
-the default and suits most driving; a longer interval is kinder to battery and
-data on a long shift.
+Tap **Interval**.
 
-![Refresh interval choices](screenshots/6_interval_dialog.png)
+![The Interval button](screenshots/6_interval_button.png)
 
-### Step 7 — Refresh right now
+Pick anything from 15 seconds to 10 minutes. 60 seconds is the default and suits
+most driving; a longer interval is kinder to battery and data on a long shift.
 
-Tap **Refresh now** if you want the current picture immediately rather than
-waiting out the interval. The timestamp updates a few seconds later, once the
-new tiles have actually arrived.
-
-![Refresh now](screenshots/7_refresh_now.png)
-
-### Step 8 — Turn it off
-
-Tap **Turn Off Traffic Overlay**. The overlay is removed, the refresh stops, and
-all network activity stops with it. Your base map is untouched.
-
-![The pane, off again](screenshots/8_pane_off_again.png)
+![Refresh interval choices](screenshots/7_interval_dialog.png)
 
 ---
 
-## 4. Screen off, and why nothing is wrong
+## 4. Leave it alone — that is the point
 
-When the device screen goes off, the overlay stops refreshing and **no tiles are
+Put the device down and do not touch it. The overlay keeps refreshing on its own,
+and the **Last refresh** time keeps advancing. This is what ATAK does not do with
+an ordinary online map source: leave that untouched and it quietly freezes at
+whatever the last redraw left behind.
+
+Watch the *timestamp*, not the colours. Traffic that has not changed looks
+identical refresh after refresh — at three in the morning it will be green for
+hours — so the timestamp is how you know it is live.
+
+**"Last refresh" means tiles arrived**, not that the traffic picture changed. If
+the network drops, that time stops moving and a warning appears beneath it. That
+is the difference between "live" and "a picture of five minutes ago".
+
+### Screen off, and why nothing is wrong
+
+When the screen goes off the overlay stops refreshing and **no tiles are
 requested at all** — it costs no battery and no data while nobody is looking at
 it.
 
-The moment you wake the device it refreshes, typically within about three
-seconds of unlocking, before you have finished reading the map. The status says
-so plainly for the couple of minutes afterwards:
+The moment you wake the device it refreshes, typically within about three seconds
+of unlocking, before you have finished reading the map. The status says so
+plainly for a couple of minutes afterwards:
 
-> *Refreshed on wake at 07:22:33*
+> *Refreshed on wake at 12:43:56*
 
-So if you pick the device up and the status shows that line, what you are
-looking at arrived after you woke it — not before you put it down.
+So if you pick the device up and see that line, what you are looking at arrived
+after you woke it — not before you put it down.
 
-![Refreshed on wake](screenshots/9_refreshed_on_wake.png)
+![Refreshed on wake](screenshots/8_refreshed_on_wake.png)
+
+### Turning it off
+
+Tap **Turn Off Traffic Overlay**. The overlay is removed, the refresh stops, and
+all network activity stops with it. Your base map is untouched, and the status
+returns to **OFF**.
 
 ---
 
