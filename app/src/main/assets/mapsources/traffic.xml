@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Google traffic.
+     https, not the http that circulates.
+     lyrs=traffic on its own is not a layer this endpoint serves: it answers 200
+     with a 1x1 empty PNG. Traffic only comes bundled with a base (h = roads,
+     m = full map), and apistyle is what suppresses that base again. Measured on
+     one downtown-LA tile at z14: h,traffic is 16.4% fully-opaque pixels, the
+     same tile with apistyle is 2.4%. That difference is the whole overlay.
+     Tiles come back with Cache-Control: max-age=60. -->
+<customMapSource>
+    <name>Traffic Overlay (live)</name>
+    <minZoom>0</minZoom>
+    <maxZoom>20</maxZoom>
+    <tileType>png</tileType>
+    <tileUpdate>60000</tileUpdate>
+    <url>https://mt1.google.com/vt?lyrs=h,traffic&amp;hl=en-US&amp;src=apiv4&amp;x={$x}&amp;y={$y}&amp;z={$z}&amp;s=Gal&amp;apistyle=s.t%3A0%7Cs.e%3Al%7Cp.v%3Aoff</url>
+    <backgroundColor>#00000000</backgroundColor>
+</customMapSource>
