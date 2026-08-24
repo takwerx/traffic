@@ -114,6 +114,14 @@ public class LiveOverlay {
     private long lastTileChangeAt;
     private long lastCheckAt;
 
+    /**
+     * When the device was last woken, so the status line can say that the tiles on screen
+     * arrived <em>because</em> the operator picked the device up. Without this the wake
+     * refresh is invisible: all it leaves behind is a recent timestamp, and the operator
+     * has to infer why it is recent.
+     */
+    private long wokeAt;
+
     /** A source the plugin can turn on: a MOBAC XML shipped in the plugin's assets. */
     public static class Source {
         public final String id;
@@ -258,6 +266,7 @@ public class LiveOverlay {
         tileCacheStamp = 0L;
         lastTileChangeAt = 0L;
         lastCheckAt = 0L;
+        wokeAt = 0L;
         fire();
     }
 
@@ -398,6 +407,19 @@ public class LiveOverlay {
         return lastCheckAt;
     }
 
+    /**
+     * True when the tiles on screen arrived from a wake refresh, and recently enough that
+     * saying so still means something. After a couple of minutes it is just the ordinary
+     * interval doing its job and the plain timestamp is the honest description.
+     */
+    public boolean isFreshFromWake() {
+        if (wokeAt == 0L || lastTileChangeAt < wokeAt)
+            return false;
+        if (lastTileChangeAt - wokeAt > 30000L)
+            return false;
+        return System.currentTimeMillis() - lastTileChangeAt < 120000L;
+    }
+
     /** True when tiles are overdue: nothing new for several intervals running. */
     public boolean isStale() {
         if (!isOn() || !screenOn || lastTileChangeAt == 0L)
@@ -439,6 +461,7 @@ public class LiveOverlay {
                 } else if (Intent.ACTION_SCREEN_ON.equals(action)
                         || Intent.ACTION_USER_PRESENT.equals(action)) {
                     screenOn = true;
+                    wokeAt = System.currentTimeMillis();
                     Log.d(TAG, action + ": refreshing");
                     // The renderer needs a moment after wake before a requested frame
                     // reaches the surface; refreshing into a surface that is not up yet

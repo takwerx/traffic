@@ -27,18 +27,20 @@ Capabilities:
   - Holds while the screen is off, and refreshes immediately on wake. Nothing
     can render with the display off, so refreshing then would spend battery to
     no purpose; what matters is being current the moment the device is picked
-    up.
+    up. The status says so explicitly when tiles arrived because the device was
+    woken, rather than leaving the operator to infer it from a recent timestamp.
   - Manual refresh that takes effect at once rather than at the next interval.
   - A status line reporting when tiles genuinely last arrived, read from the
     tile cache rather than from the plugin's own timer, so a stalled network
     shows as a timestamp that stops moving rather than one that keeps ticking
     over a frozen picture.
-  - One tap on and off, from the plugin pane.
+  - One tap on and off, from the plugin pane, with the state shown as a
+    colour-coded ON or OFF rather than buried in a sentence.
 
 _________________________________________________________________
 STATUS
 
-Release candidate. Version 0.1.
+Release candidate. Version 0.2.
 
 Exercised on hardware: Samsung Galaxy XCover Pro, ATAK-CIV 5.8.0.3, as a release
 (proguard) build. Verified on device, with the map untouched throughout:

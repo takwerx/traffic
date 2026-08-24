@@ -5,4 +5,9 @@
     <color name="darker_gray">#121212</color>
     <color name="heading_yellow">#dfb228</color>
 
+    <!-- State colours for the status line. Chosen to read against ATAK's dark chrome:
+         a pure #ff0000 vibrates badly on dark and a pure #00ff00 glares. -->
+    <color name="state_on">#3ddc61</color>
+    <color name="state_off">#ff5b52</color>
+
 </resources>
