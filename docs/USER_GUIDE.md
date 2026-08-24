@@ -4,10 +4,10 @@
 
 **Download Traffic 0.2** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
 
-- **ATAK-CIV 5.7:** _(release link — added when published)_
-- **ATAK-CIV 5.8:** _(release link — added when published)_
+- **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.7.0-civ-release.apk
+- **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.8.0-civ-release.apk
 
-All releases: _(repository releases page — added when published)_
+All releases: https://github.com/takwerx/traffic/releases
 
 Traffic draws live road traffic on top of the base map you are already using,
 and keeps it current while the map sits still.
@@ -177,4 +177,4 @@ returns to **OFF**.
 ## 6. Contact
 
 Andreas Johansson, takwerx
-_(repository issue tracker — added when published)_
+https://github.com/takwerx/traffic/issues
