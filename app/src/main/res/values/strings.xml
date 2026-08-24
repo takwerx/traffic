@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">Traffic</string>
+    <!-- description -->
+    <string name="app_desc">Live traffic drawn over your own base map, and kept refreshing while the map sits still.</string>
+
+    <string name="source_heading">Source</string>
+    <string name="source_none">Choose a source</string>
+    <string name="turn_on">Turn On Traffic Overlay</string>
+    <string name="turn_off">Turn Off Traffic Overlay</string>
+    <string name="refresh_now">Refresh now</string>
+    <string name="interval">Interval</string>
+    <string name="pick_source">Pick a source</string>
+    <string name="pick_interval">Refresh every</string>
+    <string name="off">Off.</string>
+    <string name="on_now">Traffic overlay is on.</string>
+    <string name="overlay_note">Draws above whatever base map you have selected, so your own map stays underneath.</string>
+</resources>
