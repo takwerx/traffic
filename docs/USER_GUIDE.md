@@ -4,6 +4,7 @@
 
 **Download Traffic 0.2** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
 
+- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.6.0-civ-release.apk
 - **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.7.0-civ-release.apk
 - **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.8.0-civ-release.apk
 
@@ -43,7 +44,7 @@ map stays current whether or not anyone is touching it.
 ## 2. Before you start
 
 - **Match the plugin to your ATAK version.** Plugin builds are tied to the ATAK
-  release they were built for (5.7 and 5.8 builds are published). A mismatched
+  release they were built for (5.6, 5.7 and 5.8 builds are published). A mismatched
   build will not load.
 - **Install and load the plugin** through ATAK's *Plugins* manager (TAK Package
   Mgmt), the same as any other plugin.
@@ -69,7 +70,7 @@ on the ATAK toolbar. The icon is a traffic light over a road.
 
 Three controls and a status line. The state is the first thing on it — **OFF** in
 red — so you can tell at a glance without reading. Refresh and Interval are
-greyed out until the overlay is on, and opening the pane changes nothing on the
+grayed out until the overlay is on, and opening the pane changes nothing on the
 map.
 
 ![The Traffic pane, off](screenshots/2_pane_off.png)
@@ -120,7 +121,7 @@ and the **Last refresh** time keeps advancing. This is what ATAK does not do wit
 an ordinary online map source: leave that untouched and it quietly freezes at
 whatever the last redraw left behind.
 
-Watch the *timestamp*, not the colours. Traffic that has not changed looks
+Watch the *timestamp*, not the colors. Traffic that has not changed looks
 identical refresh after refresh — at three in the morning it will be green for
 hours — so the timestamp is how you know it is live.
 
@@ -157,7 +158,7 @@ returns to **OFF**.
 
 - **Traffic that does not change is not a fault.** At three in the morning the
   picture will look identical refresh after refresh. Watch the *timestamp*, not
-  the colours, to know it is live.
+  the colors, to know it is live.
 - **"Last refresh" means tiles arrived**, not that the traffic picture changed.
   A successful refresh with no change looks the same as no change at all —
   except the timestamp moves.
