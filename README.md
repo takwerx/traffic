@@ -2,6 +2,7 @@ ATAK Plugin — Traffic
 
 **Download Traffic 0.2** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
 
+- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.6.0-civ-release.apk
 - **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.7.0-civ-release.apk
 - **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.8.0-civ-release.apk
 
@@ -19,7 +20,7 @@ sits still.
 
 ATAK can already display an online tile source, and a MOBAC source can declare a
 refresh interval. Two things stop that from producing a live overlay. The
-interval is only honoured while the map is being drawn, so a device that pans
+interval is only honored while the map is being drawn, so a device that pans
 stays current and a device sitting on a desk silently goes stale -- which is the
 state an operator is usually in when they want to read traffic. And a composited
 multi-layer source is built with no refresh interval at all, so the one
@@ -45,7 +46,7 @@ Capabilities:
     shows as a timestamp that stops moving rather than one that keeps ticking
     over a frozen picture.
   - One tap on and off, from the plugin pane, with the state shown as a
-    colour-coded ON or OFF rather than buried in a sentence.
+    color-coded ON or OFF rather than buried in a sentence.
 
 _________________________________________________________________
 STATUS
@@ -102,7 +103,7 @@ PORTS REQUIRED
 _________________________________________________________________
 EQUIPMENT REQUIRED
 
-  Android device supported by ATAK-CIV 5.8.
+  Android device supported by ATAK-CIV 5.6, 5.7 or 5.8.
   A network connection while the overlay is in use. Traffic is live data and has
   no meaningful offline mode -- cached tiles are, by definition, old traffic.
   Negligible storage: tiles land in ATAK's existing imagery cache.
@@ -170,7 +171,7 @@ DEVELOPER NOTES
   and a dead network freezes it. It does not mean the traffic picture changed.
 
   Passing a null working directory when creating the dataset descriptor does not
-  avoid the disk cache: MobacMapSourceLayerInfoSpi also honours the global
+  avoid the disk cache: MobacMapSourceLayerInfoSpi also honors the global
   ConfigOptions imagery.offline-cache-dir, which ATAK sets. The cache, and its
   one-week expiry floor, apply regardless -- defeating that floor is what the
   refresh interval is for.
