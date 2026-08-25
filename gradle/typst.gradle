@@ -96,10 +96,19 @@ task runTypst(dependsOn: setupTypst) {
         // Write the modified content back to the file
         typFile.text = fileContent
 
-        // Check if 'typst' is available
-        def typstExecutable = 'typst'
-        if (!new File(typstExecutable).exists()) {
-            typstExecutable = "${extractDir}/typst"  // Use the local executable if 'typst' is not found
+        // Prefer a typst already on PATH. The stock check was
+        // `new File('typst').exists()`, a RELATIVE path that is essentially
+        // never there, so it always fell through to the downloaded binary --
+        // which is linux-musl and cannot run on a developer's Mac. That made
+        // the manual unbuildable outside tak.gov, which is how a plugin once
+        // shipped a manual nobody could open.
+        def typstExecutable = "${extractDir}/typst"
+        def onPath = (System.getenv("PATH") ?: "").split(File.pathSeparator)
+                .collect { new File(it, "typst") }
+                .find { it.isFile() && it.canExecute() }
+        if (onPath != null) {
+            typstExecutable = onPath.absolutePath
+            println "using typst from PATH: ${typstExecutable}"
         }
 
         // Run the typst compile command
@@ -120,15 +129,23 @@ task runTypst(dependsOn: setupTypst) {
     }
 }
 
-// Only runs by default on the official ATAK release pipeline.
-if (System.getenv("ATAK_CI") == "1") {
+// Runs by default on the official ATAK release pipeline, and on demand locally
+// with -PbuildManual (or BUILD_MANUAL=1). Local opt-in exists so the manual can
+// be put on a device and opened BEFORE a submission rather than after: it is
+// the only way to find out that a manual is unreachable, which is not visible
+// by unzipping the APK.
+def wantManual = System.getenv("ATAK_CI") == "1" ||
+        System.getenv("BUILD_MANUAL") == "1" ||
+        project.hasProperty("buildManual")
+
+if (wantManual) {
     println("running typst to generate the user manual");
     android.applicationVariants.all { variant ->
         variant.mergeResourcesProvider.configure {
             dependsOn runTypst
         }
     }
-} else { 
-    println("skipping user manual generation");
+} else {
+    println("skipping user manual generation (use -PbuildManual to include it)");
 }
 
