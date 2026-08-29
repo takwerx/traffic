@@ -19,6 +19,7 @@
     <!-- A button plus a chooser dialog rather than a Spinner: a Spinner inflated
          against the plugin context has no window token and takes ATAK down with it. -->
     <Button
+        style="@style/TakwerxButton"
         android:id="@+id/btn_source"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,6 +27,7 @@
         android:text="@string/source_none" />
 
     <Button
+        style="@style/TakwerxButton"
         android:id="@+id/btn_toggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,6 +42,7 @@
         android:orientation="horizontal">
 
         <Button
+            style="@style/TakwerxButton"
             android:id="@+id/btn_refresh"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -48,6 +51,7 @@
             android:text="@string/refresh_now" />
 
         <Button
+            style="@style/TakwerxButton"
             android:id="@+id/btn_interval"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
