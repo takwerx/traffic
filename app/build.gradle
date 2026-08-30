@@ -286,6 +286,9 @@ def getCommandFlavor() {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
+    // The SDK template ships an ExampleTest and no junit, so testCivDebugUnitTest
+    // could not compile in any plugin scaffolded from it.
+    testImplementation 'junit:junit:4.13.2'
 }
 
 configurations.all {
