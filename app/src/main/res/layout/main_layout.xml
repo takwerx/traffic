@@ -26,14 +26,59 @@
         android:minHeight="56dp"
         android:text="@string/source_none" />
 
-    <Button
-        style="@style/TakwerxButton"
-        android:id="@+id/btn_toggle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:minHeight="64dp"
-        android:text="@string/app_name" />
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="4dp"
+                android:text="@string/traffic_heading"
+                android:textSize="12sp" />
+
+            <Button
+                style="@style/TakwerxButton"
+                android:id="@+id/btn_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="56dp"
+                android:text="@string/state_off_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="4dp"
+                android:text="@string/persist_heading"
+                android:textSize="12sp" />
+
+            <Button
+                style="@style/TakwerxButton"
+                android:id="@+id/btn_persist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="56dp"
+                android:text="@string/state_off_label" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

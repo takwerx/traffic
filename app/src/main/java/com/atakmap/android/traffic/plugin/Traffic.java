@@ -62,8 +62,32 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
     /** Offered intervals, in seconds. */
     private static final int[] INTERVAL_CHOICES = { 15, 30, 60, 120, 300, 600 };
 
+    /**
+     * Whether the overlay was on when ATAK last stopped, and which source it was
+     * showing.
+     *
+     * On the MapView context, not the plugin's: plugin-context preferences do not
+     * survive the plugin being reloaded, so a state remembered there would be
+     * forgotten by the next update -- which is the one thing this is for.
+     *
+     * The source is stored by its id rather than its position, so adding or
+     * reordering sources later cannot silently select a different one.
+     */
+    private static final String PREF_ON = "traffic.overlayOn";
+    private static final String PREF_SOURCE = "traffic.sourceId";
+
+    /**
+     * Whether the operator wants the overlay back after an ATAK restart.
+     *
+     * Opt-in, and off by default. Restoring means the feed starts fetching the
+     * moment ATAK launches, which is not a decision to make on someone's behalf
+     * on a metered connection or a cold start in the field.
+     */
+    private static final String PREF_PERSIST = "traffic.persist";
+
     private Button sourceButton;
     private Button toggleButton;
+    private Button persistButton;
     private Button refreshButton;
     private Button intervalButton;
     private TextView status;
@@ -105,6 +129,7 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
                     public void onClick(ToolbarItem item) {
                         showPane();
                     }
+
                 }).setIdentifier(pluginContext.getPackageName())
                 .build();
     }
@@ -112,6 +137,7 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
     @Override
     public void onStart() {
         registerPreferences();
+        restore();
 
         if (uiService == null)
             return;
@@ -193,6 +219,23 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
                     pickSource();
                 }
             });
+            persistButton = v.findViewById(R.id.btn_persist);
+            persistButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View unused) {
+                    final android.content.SharedPreferences pr = prefs();
+                    if (pr == null)
+                        return;
+                    final boolean on = !pr.getBoolean(PREF_PERSIST, false);
+                    pr.edit().putBoolean(PREF_PERSIST, on).apply();
+                    // Turning it on should capture what is on the map now,
+                    // rather than waiting for the next deliberate toggle.
+                    if (on)
+                        remember(overlay != null && overlay.isOn());
+                    render();
+                }
+            });
+
             toggleButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -241,12 +284,70 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
 
         if (overlay.isOn()) {
             overlay.turnOff();
+            remember(false);
             return;
         }
 
         final String failure = overlay.turnOn(chosen);
         if (failure != null)
             say(chosen.label + " did not load.\n\n" + failure);
+        // Recorded from what the overlay actually did, not from what was asked,
+        // so a source that failed to load is not restored as on next launch.
+        remember(overlay.isOn());
+    }
+
+    /** Stores the overlay's state so the next launch can come back to it. */
+    private void remember(boolean on) {
+        final android.content.SharedPreferences prefs = prefs();
+        if (prefs == null)
+            return;
+        prefs.edit()
+                .putBoolean(PREF_ON, on)
+                .putString(PREF_SOURCE, chosen == null ? "" : chosen.id)
+                .apply();
+    }
+
+    /**
+     * Puts the overlay back the way the operator left it.
+     *
+     * Silent about failure on purpose: this runs while ATAK is starting, and a
+     * dialog or a toast about a feed that did not load is noise at the moment
+     * the operator is looking at the map, not at this plugin. The stored state
+     * is left alone so the next deliberate toggle still knows what was wanted.
+     */
+    private void restore() {
+        final android.content.SharedPreferences prefs = prefs();
+        if (prefs == null || !prefs.getBoolean(PREF_PERSIST, false)
+                || !prefs.getBoolean(PREF_ON, false))
+            return;
+
+        final String id = prefs.getString(PREF_SOURCE, "");
+        for (final LiveOverlay.Source s : sources) {
+            if (s.id.equals(id)) {
+                chosen = s;
+                break;
+            }
+        }
+
+        final MapView mapView = MapView.getMapView();
+        if (mapView == null) {
+            Log.w(TAG, "no map view at startup; overlay not restored");
+            return;
+        }
+        if (overlay == null) {
+            overlay = new LiveOverlay(mapView, pluginContext);
+            overlay.setListener(this);
+        }
+        final String failure = overlay.turnOn(chosen);
+        if (failure != null)
+            Log.w(TAG, "could not restore " + chosen.label + ": " + failure);
+    }
+
+    private static android.content.SharedPreferences prefs() {
+        final MapView mv = MapView.getMapView();
+        return mv == null ? null
+                : android.preference.PreferenceManager
+                        .getDefaultSharedPreferences(mv.getContext());
     }
 
     private void pickSource() {
@@ -264,6 +365,7 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
                         final LiveOverlay.Source picked = sources.get(which);
                         final boolean wasOn = overlay != null && overlay.isOn();
                         chosen = picked;
+                        remember(wasOn);
                         if (wasOn) {
                             final String failure = overlay.turnOn(picked);
                             if (failure != null)
@@ -313,6 +415,18 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
     }
 
     /** Paint the controls from the overlay's actual state, never from what was asked. */
+    /**
+     * ON in green, OFF in plain white. Both buttons read the same way, so the
+     * pane can be understood without reading either label carefully.
+     */
+    private void setState(Button b, boolean on) {
+        if (b == null)
+            return;
+        b.setText(on ? R.string.state_on_label : R.string.state_off_label);
+        b.setTextColor(pluginContext.getResources().getColor(
+                on ? R.color.state_on : R.color.white));
+    }
+
     private void render() {
         if (sourceButton == null)
             return;
@@ -321,7 +435,13 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
                 : pluginContext.getString(R.string.source_none));
 
         final boolean on = overlay != null && overlay.isOn();
-        toggleButton.setText(on ? R.string.turn_off : R.string.turn_on);
+        setState(toggleButton, on);
+
+        if (persistButton != null) {
+            final android.content.SharedPreferences pr = prefs();
+            setState(persistButton, pr != null
+                    && pr.getBoolean(PREF_PERSIST, false));
+        }
         refreshButton.setEnabled(on);
         intervalButton.setEnabled(on);
 

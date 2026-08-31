@@ -20,4 +20,8 @@
     <string name="prefs_summary">Open the Traffic user guide</string>
     <string name="manual_title">Plugin Documentation</string>
     <string name="manual_summary">Open the Traffic user guide: turning the overlay on, what the markers mean, and how the feed refreshes</string>
+    <string name="traffic_heading">Traffic Overlay</string>
+    <string name="persist_heading">Persistent Overlay</string>
+    <string name="state_on_label">ON</string>
+    <string name="state_off_label">OFF</string>
 </resources>
