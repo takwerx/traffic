@@ -46,6 +46,8 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
     private static final String TAG = "Traffic";
 
     private final IServiceController serviceController;
+    private static final String PREFS_KEY = "traffic_preferences";
+
     private Context pluginContext;
     private IHostUIService uiService;
     private ToolbarItem toolbarItem;
@@ -95,7 +97,7 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
         toolbarItem = new ToolbarItem.Builder(
                 pluginContext.getString(R.string.app_name),
                 MarshalManager.marshal(
-                        pluginContext.getResources().getDrawable(R.drawable.ic_launcher),
+                        pluginContext.getResources().getDrawable(R.drawable.ic_toolbar),
                         android.graphics.drawable.Drawable.class,
                         gov.tak.api.commons.graphics.Bitmap.class))
                 .setListener(new ToolbarItemAdapter() {
@@ -109,6 +111,8 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
 
     @Override
     public void onStart() {
+        registerPreferences();
+
         if (uiService == null)
             return;
         uiService.addToolbarItem(toolbarItem);
@@ -122,9 +126,45 @@ public class Traffic implements IPlugin, LiveOverlay.Listener {
             overlay.turnOff();
             overlay = null;
         }
+        unregisterPreferences();
+
         if (uiService == null)
             return;
         uiService.removeToolbarItem(toolbarItem);
+    }
+
+    /**
+     * Puts Traffic into ATAK's Tool Preferences, which is the only route to the
+     * user manual. The PDF is built into the plugin's assets, and an asset is
+     * not reachable by anyone -- without this entry it ships inside the APK
+     * with no way to open it, which is what 0.2 did.
+     *
+     * Guarded rather than assumed: a build that does not expose
+     * {@code ToolsPreferenceFragment} should lose the manual, not the plugin.
+     */
+    private void registerPreferences() {
+        try {
+            com.atakmap.app.preferences.ToolsPreferenceFragment.register(
+                    new com.atakmap.app.preferences.ToolsPreferenceFragment
+                            .ToolPreference(
+                            pluginContext.getString(R.string.app_name),
+                            pluginContext.getString(R.string.prefs_summary),
+                            PREFS_KEY,
+                            pluginContext.getResources().getDrawable(
+                                    R.drawable.ic_toolbar),
+                            new TrafficPreferenceFragment(pluginContext)));
+        } catch (LinkageError | RuntimeException notThisBuild) {
+            Log.w(TAG, "could not register preferences: " + notThisBuild);
+        }
+    }
+
+    private void unregisterPreferences() {
+        try {
+            com.atakmap.app.preferences.ToolsPreferenceFragment
+                    .unregister(PREFS_KEY);
+        } catch (LinkageError | RuntimeException notThisBuild) {
+            Log.w(TAG, "could not unregister preferences: " + notThisBuild);
+        }
     }
 
     // ------------------------------------------------------------------------ pane

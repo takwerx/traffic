@@ -1,53 +1,79 @@
 
+// A typst already on PATH is preferred over downloading one. That removes a
+// ~30 MB network fetch from the middle of the build, which is the only step
+// here whose success varies from one run to the next on a shared builder.
+def typstOnPath = {
+    (System.getenv("PATH") ?: "").split(File.pathSeparator)
+            .collect { new File(it, "typst") }
+            .find { it.isFile() && it.canExecute() }
+}
+
 task setupTypst {
     group = "typst"
-    description = "Sets up Typst by downloading and extracting the binary."
+    description = "Downloads the pinned Typst binary, unless one is on PATH."
 
     def typstUrl = "https://github.com/typst/typst/releases/download/v0.13.1/typst-x86_64-unknown-linux-musl.tar.xz"
     def downloadDir = file("${buildDir}/typst")
     def tarFile = file("${downloadDir}/typst.tar.xz")
     def extractDir = file("${downloadDir}/extracted")
+    def binary = file("${extractDir}/typst-x86_64-unknown-linux-musl/typst")
 
     inputs.property("typstUrl", typstUrl)
     outputs.dir(extractDir)
 
     doLast {
-        if (file("$extractDir/typst-x86_64-unknown-linux-musl/typst").exists()) {
+        def onPath = typstOnPath()
+        if (onPath != null) {
+            println "typst already on PATH (${onPath.absolutePath}), not downloading"
+            extractDir.mkdirs()
+            return
+        }
+        if (binary.isFile()) {
             // Already downloaded and extracted.
             return
         }
 
-        // Ensure the download directory exists
-        if (!downloadDir.exists()) {
-            downloadDir.mkdirs()
+        downloadDir.mkdirs()
+        extractDir.mkdirs()
+
+        // -f so that an HTTP error is an error. Without it curl writes the
+        // error body into the tarball and still exits 0, and the build then
+        // fails at tar with "Extraction failed", which says nothing about the
+        // network and is why a failed build here reports no useful reason.
+        // --retry because this is a shared builder pulling 30 MB from GitHub
+        // once per ATAK target, and a transient failure there is not a reason
+        // to fail a submission.
+        def cmd = ["curl", "-fsSL", "--retry", "5", "--retry-delay", "2",
+                   "--retry-all-errors", "--connect-timeout", "30",
+                   typstUrl, "-o", tarFile.absolutePath]
+        println "Executing: ${cmd.join(' ')}"
+        def dl = cmd.execute()
+        // Drain the streams. The stock task called waitFor() without reading
+        // them, so curl could fill the pipe buffer and block forever.
+        dl.waitForProcessOutput(System.out, System.err)
+        if (dl.exitValue() != 0) {
+            throw new GradleException("Could not download typst from ${typstUrl}"
+                    + " (curl exit ${dl.exitValue()}). The user manual cannot be"
+                    + " built without it.")
+        }
+        if (!tarFile.isFile() || tarFile.length() < 1024 * 1024) {
+            throw new GradleException("The typst download is too small to be the"
+                    + " release tarball (${tarFile.length()} bytes). The server"
+                    + " answered with something other than the archive.")
         }
 
-        // Download the Typst archive using curl or wget
-        def downloadCommand = "curl -L $typstUrl -o $tarFile"
-        println "Executing: $downloadCommand"
-        def downloadProcess = downloadCommand.execute()
-        downloadProcess.waitFor()
-
-        if (downloadProcess.exitValue() != 0) {
-            throw new GradleException("Download failed with exit code ${downloadProcess.exitValue()}")
+        def ex = ["tar", "-xf", tarFile.absolutePath, "-C",
+                  extractDir.absolutePath].execute()
+        ex.waitForProcessOutput(System.out, System.err)
+        if (ex.exitValue() != 0) {
+            throw new GradleException("Could not extract ${tarFile}"
+                    + " (tar exit ${ex.exitValue()}).")
         }
-
-        // Ensure the extract directory exists
-        if (!extractDir.exists()) {
-            extractDir.mkdirs()
+        if (!binary.isFile()) {
+            throw new GradleException("typst extracted but ${binary} is missing;"
+                    + " the archive layout is not what was expected.")
         }
-
-        // Decompress and extract the tar.xz file using bash commands
-        def extractCommand = "tar -xf $tarFile -C $extractDir"
-        println "Executing: $extractCommand"
-        def extractProcess = extractCommand.execute()
-        extractProcess.waitFor()
-
-        if (extractProcess.exitValue() != 0) {
-            throw new GradleException("Extraction failed with exit code ${extractProcess.exitValue()}")
-        }
-
-        // Remove the tar.xz file after extraction
+        binary.setExecutable(true)
         tarFile.delete()
     }
 }
@@ -103,9 +129,7 @@ task runTypst(dependsOn: setupTypst) {
         // the manual unbuildable outside tak.gov, which is how a plugin once
         // shipped a manual nobody could open.
         def typstExecutable = "${extractDir}/typst"
-        def onPath = (System.getenv("PATH") ?: "").split(File.pathSeparator)
-                .collect { new File(it, "typst") }
-                .find { it.isFile() && it.canExecute() }
+        def onPath = typstOnPath()
         if (onPath != null) {
             typstExecutable = onPath.absolutePath
             println "using typst from PATH: ${typstExecutable}"

@@ -17,4 +17,7 @@
     <string name="state_on">ON</string>
     <string name="overlay_note">Draws above whatever base map you have selected, so your own map stays underneath.\n\nWith the screen off no tiles are requested, so the overlay costs no battery or data while you are not looking at it. It refreshes as soon as you wake the device.</string>
     <string name="woke_fmt">Refreshed on wake at %1$s</string>
+    <string name="prefs_summary">Open the Traffic user guide</string>
+    <string name="manual_title">Plugin Documentation</string>
+    <string name="manual_summary">Open the Traffic user guide: turning the overlay on, what the markers mean, and how the feed refreshes</string>
 </resources>

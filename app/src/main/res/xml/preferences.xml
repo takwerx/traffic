@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Traffic has no settings: the feed is fixed and the overlay is driven from
+    the plugin's own pane. This screen exists so the manual has somewhere to be
+    reached from. ATAK surfaces a plugin's documentation through its Tool
+    Preferences entry, and without one the PDF ships inside the APK with no way
+    for anyone to open it.
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.atakmap.android.gui.PanPreference
+        android:key="manual"
+        android:title="@string/manual_title"
+        android:summary="@string/manual_summary" />
+
+</PreferenceScreen>
