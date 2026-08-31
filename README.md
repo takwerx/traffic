@@ -1,10 +1,10 @@
 ATAK Plugin — Traffic
 
-**Download Traffic 0.2** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
+**Download Traffic 0.5** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
 
-- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.6.0-civ-release.apk
-- **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.7.0-civ-release.apk
-- **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.2/ATAK-Plugin-Traffic-0.2--5.8.0-civ-release.apk
+- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.5/ATAK-Plugin-Traffic-0.5--5.6.0-civ-release.apk
+- **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.5/ATAK-Plugin-Traffic-0.5--5.7.0-civ-release.apk
+- **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.5/ATAK-Plugin-Traffic-0.5--5.8.0-civ-release.apk
 
 All releases: https://github.com/takwerx/traffic/releases
 
@@ -51,7 +51,7 @@ Capabilities:
 _________________________________________________________________
 STATUS
 
-Release candidate. Version 0.2.
+Version 0.5. Verified on ATAK-CIV 5.7.0.5.
 
 Exercised on hardware: Samsung Galaxy XCover Pro, ATAK-CIV 5.8.0.3, as a release
 (proguard) build. Verified on device, with the map untouched throughout:
