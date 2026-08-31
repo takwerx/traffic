@@ -3,7 +3,7 @@
 
 #show: userguide.with(
    plugin-name: "Traffic",
-   plugin-version: "0.4",
+   plugin-version: "0.5",
    platform: "ATAK",
    platform-version: "5.8.0",
 )
@@ -32,6 +32,15 @@ that puts traffic over your own base map is the one that cannot refresh.
 #v(6pt)
 
 This plugin owns its overlay and drives the refresh itself.
+
+#v(6pt)
+
+#toolbox.side-by-side(columns: (7fr, 5fr))[
+  #image("03.jpg", width: 96%)
+][
+  Traffic drawn over the operator's own base map, which stays visible
+  underneath it.
+]
 ]
 
 #tak-slide[
@@ -69,6 +78,18 @@ refreshes on its own -- 15 seconds to 10 minutes.
 
 Turning the overlay on replaces whatever the plugin was drawing before. It
 never stacks two.
+
+#v(6pt)
+
+#toolbox.side-by-side(columns: (6fr, 6fr))[
+  #image("01.png", width: 92%)
+
+  Everything off, and what each control does.
+][
+  #image("04.png", width: 92%)
+
+  The refresh intervals, 15 seconds to 10 minutes.
+]
 ]
 
 #tak-slide[
@@ -94,6 +115,15 @@ connection or a cold start in the field.
 
 A feed that failed to load is not restored as on. What is remembered is what
 the overlay actually did, not what was asked of it.
+
+#v(6pt)
+
+#toolbox.side-by-side(columns: (6fr, 6fr))[
+  #image("02.png", width: 94%)
+][
+  Both on. The status underneath says how often it is refreshing and when the
+  tiles last arrived.
+]
 ]
 
 #tak-slide[
@@ -137,6 +167,15 @@ so plainly for a couple of minutes afterwards:
 
 So if you pick the device up and see that line, what you are looking at arrived
 after you woke it -- not before you put it down.
+
+#v(6pt)
+
+#toolbox.side-by-side(columns: (6fr, 6fr))[
+  #image("05.png", width: 94%)
+][
+  Woken at 16:26:52, and the overlay had refreshed before the panel was even
+  opened.
+]
 ]
 
 #tak-slide[
