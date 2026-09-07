@@ -9,6 +9,17 @@
 buildscript {
 
     ext.PLUGIN_VERSION = "0.5"
+    // Android's integer version. The package manager and every MDM decide "is
+    // this an update" from this number alone; versionName is display only. The
+    // SDK's getVersionCode() reads the git commit and tak.gov builds from a zip
+    // with no .git, so every signed release carried versionCode 1 and Watchtower
+    // could not push Cam Depot 1.2 over 1.1 (2026-09-06). Derived from
+    // PLUGIN_VERSION instead, the same on every machine: 1.3 -> 10300,
+    // 1.3.1 -> 10301. submission-zip.sh fails the zip when the APK disagrees.
+    ext.PLUGIN_VERSION_CODE = { ->
+        def p = (PLUGIN_VERSION.tokenize('.') + ['0', '0']).collect { it as int }
+        return p[0] * 10000 + p[1] * 100 + p[2]
+    }()
     ext.ATAK_VERSION = '5.8.0'
 
     def takdevVersion = '3.+'
@@ -209,7 +220,8 @@ android {
             // It is strongly encouraged that plugin developers do not modify the archiveBaseName, version code logic and version 
             // name logic to provide for consistency within the community.   
             setProperty("archivesBaseName", "ATAK-Plugin-" + rootProject.name + "-" + PLUGIN_VERSION + "-" + getVersionName() + "-" + ATAK_VERSION)
-            defaultConfig.versionCode = getVersionCode()
+            // Not getVersionCode(): that is 1 at tak.gov. See PLUGIN_VERSION_CODE above.
+            defaultConfig.versionCode = PLUGIN_VERSION_CODE
             defaultConfig.versionName = PLUGIN_VERSION + " (" + getVersionName() + ") - [" + ATAK_VERSION + "]"
         }
 
