@@ -1,6 +1,6 @@
 # Traffic for ATAK — User Guide
 
-**Version 0.5 · takwerx**
+**Version 0.6 · takwerx**
 
 **Download Traffic 0.6** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
 
