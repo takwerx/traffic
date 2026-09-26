@@ -82,8 +82,8 @@ public class IncidentFeed {
     private static final String PREF_SCOPE_RADIUS = "traffic.511.scopeRadiusM";
     /** A radius re-centers once its point has moved a fifth of it, never under this. */
     private static final double SCOPE_MIN_MOVE_M = 250d;
-    /** Not live until the poller is hosted (PLAN-Traffic-511-v0.7, step 5). */
-    public static final String DEFAULT_SERVER = "https://mapdepot.takwerx.org/traffic511/";
+    /** The publisher on the Oracle VM behind cams.takwerx.org (tools/traffic511/deploy). */
+    public static final String DEFAULT_SERVER = "https://cams.takwerx.org/traffic511/";
     /** A debug build talks to the poller on the dev Mac, through `adb reverse`. */
     public static final String DEV_SERVER = "http://127.0.0.1:8511/";
 

@@ -8,7 +8,7 @@
 
 buildscript {
 
-    ext.PLUGIN_VERSION = "0.6"
+    ext.PLUGIN_VERSION = "0.7"
     ext.ATAK_VERSION = '5.8.0'
     // Android's integer version. The package manager and every MDM decide "is
     // this an update" from this number alone; versionName is display only. The

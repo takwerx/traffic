@@ -1,10 +1,10 @@
 ATAK Plugin — Traffic
 
-**Download Traffic 0.6** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
+**Download Traffic 0.7** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
 
-- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.6/ATAK-Plugin-Traffic-0.6--5.6.0-civ-release.apk
-- **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.6/ATAK-Plugin-Traffic-0.6--5.7.0-civ-release.apk
-- **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.6/ATAK-Plugin-Traffic-0.6--5.8.0-civ-release.apk
+- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.7/ATAK-Plugin-Traffic-0.7--5.6.0-civ-release.apk
+- **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.7/ATAK-Plugin-Traffic-0.7--5.7.0-civ-release.apk
+- **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.7/ATAK-Plugin-Traffic-0.7--5.8.0-civ-release.apk
 
 All releases: https://github.com/takwerx/traffic/releases
 
@@ -47,9 +47,31 @@ Capabilities:
     over a frozen picture.
   - One tap on and off, from the plugin pane, with the state shown as a
     color-coded ON or OFF rather than buried in a sentence.
+  - Highway shields drawn above the traffic colors, so a route number stays
+    readable where the traffic line would otherwise cover it.
+
+Road incidents (511), new in 0.7:
+
+  - Crashes, closures, lane closures, road work, hazards, vehicle fires, chain
+    control, weather and message signs from every US state's traveler
+    information system, drawn as icons. No road lines: traffic flow comes from
+    the traffic overlay above.
+  - The operator picks the states they care about; the first run offers the
+    state they are in.
+  - Each type can be switched off, drawn only past a chosen zoom, and limited to
+    what is in view or a radius around the operator or the map center.
+  - Tapping an incident opens its details, which keep updating while open:
+    what, where, the reporting agency, when it was reported and last updated,
+    responding units where the agency publishes them (California Highway
+    Patrol), and message signs drawn as the sign reads.
+  - Refreshes every 15 seconds while the screen is on.
 
 _________________________________________________________________
 STATUS
+
+Version 0.7: road incidents from all 50 states (see PURPOSE AND CAPABILITIES),
+and highway shields above the traffic colors. Verified on ATAK-CIV 5.8.0.3
+(dev build) on a Samsung Galaxy S10.
 
 Version 0.6: one versionCode per APK. The same plugin as 0.5, rebuilt so that
 each ATAK target's APK carries its own versionCode, the plugin version and the
@@ -82,7 +104,7 @@ PORTS REQUIRED
 (This is important for ATO, networking, and other security concerns)
 
   Outbound TCP 443 (HTTPS) only, and only while the operator has the overlay
-  turned on and the device screen is awake.
+  or the road incidents turned on and the device screen is awake.
 
   The plugin streams map tiles from a Google tile endpoint, mt1.google.com. This
   is an undocumented, unauthenticated endpoint -- no API key is used or
@@ -96,11 +118,20 @@ PORTS REQUIRED
 
   Traffic is requested at whatever interval the operator selects, default 60
   seconds. Turning the overlay off, or the screen off, stops all traffic
-  immediately.
+  immediately. Highway shields come from the same Google endpoint, as a second
+  tile layer over the same area.
+
+  Road incidents (511) come from takwerx's own server, cams.takwerx.org, path
+  /traffic511/. The device asks it for a small index every 15 seconds and for
+  the file of each state the operator picked when that file has changed
+  (conditional GET, If-Modified-Since). Requests carry no credentials and no
+  device identity; what the server can infer is which states were picked. The
+  server gathers the data from each state's public traveler information
+  system; the device never contacts a state agency itself.
 
   No inbound ports. No listening sockets. No traffic to or from the TAK server,
-  and no CoT is generated or consumed. With the overlay off the plugin makes no
-  network calls at all.
+  and no CoT is generated or consumed. With the overlay and the road incidents
+  off the plugin makes no network calls at all.
 
   Tiles are cached by ATAK's own imagery cache, in the standard imagecache
   location, and are subject to ATAK's cache management.
@@ -111,7 +142,9 @@ EQUIPMENT REQUIRED
   Android device supported by ATAK-CIV 5.6, 5.7 or 5.8.
   A network connection while the overlay is in use. Traffic is live data and has
   no meaningful offline mode -- cached tiles are, by definition, old traffic.
-  Negligible storage: tiles land in ATAK's existing imagery cache.
+  Negligible storage: tiles land in ATAK's existing imagery cache; road
+  incidents are held in a small per-session database under ATAK's tools
+  directory, replaced each time the plugin starts.
 
 _________________________________________________________________
 EQUIPMENT SUPPORTED
