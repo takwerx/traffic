@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One incident type's switch: its map icon, its name, and ON or OFF under it. -->
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/TakwerxButton"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:drawablePadding="8dp"
+    android:ellipsize="end"
+    android:gravity="center_vertical|start"
+    android:maxLines="2"
+    android:minHeight="52dp"
+    android:singleLine="false"
+    android:textSize="14sp" />

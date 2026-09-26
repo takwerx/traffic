@@ -80,6 +80,13 @@ public class LiveOverlay {
     private Source source;
     private RuntimeRasterDataStore store;
     private DatasetRasterLayer2 layer;
+    /**
+     * The source's labels, drawn above it: highway shields the traffic line would
+     * otherwise cover. Added after {@link #layer} so it draws on top, and never
+     * refreshed -- labels do not change -- so the heartbeat leaves it alone.
+     */
+    private RuntimeRasterDataStore labelStore;
+    private DatasetRasterLayer2 labelLayer;
     private OnlineImageryExtension refresh;
 
     private long intervalMs;
@@ -129,12 +136,20 @@ public class LiveOverlay {
         public final String asset;
         /** Fallback only. The XML's own {@code <tileUpdate>} wins when it has one. */
         public final long defaultIntervalMs;
+        /** A labels-only source drawn above this one, or null. */
+        public final String labelsAsset;
 
         public Source(String id, String label, String asset, long defaultIntervalMs) {
+            this(id, label, asset, defaultIntervalMs, null);
+        }
+
+        public Source(String id, String label, String asset, long defaultIntervalMs,
+                String labelsAsset) {
             this.id = id;
             this.label = label;
             this.asset = asset;
             this.defaultIntervalMs = defaultIntervalMs;
+            this.labelsAsset = labelsAsset;
         }
     }
 
@@ -178,7 +193,7 @@ public class LiveOverlay {
     public String turnOn(Source src) {
         turnOff();
         try {
-            final File xml = stageAsset(src);
+            final File xml = stageAsset(src.asset);
             if (xml == null)
                 return "could not unpack " + src.asset;
 
@@ -223,6 +238,7 @@ public class LiveOverlay {
             lastCheckAt = 0L;
 
             mapView.addLayer(MapView.RenderStack.RASTER_OVERLAYS, layer);
+            addLabels(src);
             source = src;
             lastPumpAt = 0L;
             pumps = 0;
@@ -239,10 +255,58 @@ public class LiveOverlay {
         }
     }
 
+    /**
+     * The labels layer, above the traffic. Its failure costs only the labels: the
+     * traffic is already on and stays on.
+     */
+    private void addLabels(Source src) {
+        if (src.labelsAsset == null)
+            return;
+        try {
+            final File xml = stageAsset(src.labelsAsset);
+            final Set<DatasetDescriptor> descs = xml == null ? null
+                    : DatasetDescriptorFactory2.create(xml, null, null, null);
+            if (descs == null || descs.isEmpty()) {
+                Log.w(TAG, "labels source not recognised: " + src.labelsAsset);
+                return;
+            }
+            labelStore = new RuntimeRasterDataStore();
+            for (DatasetDescriptor d : descs)
+                labelStore.add(d);
+            labelLayer = new DatasetRasterLayer2(src.label + " labels", labelStore, 1);
+            labelLayer.setVisible(true);
+            mapView.addLayer(MapView.RenderStack.RASTER_OVERLAYS, labelLayer);
+        } catch (Throwable t) {
+            Log.w(TAG, "labels layer failed; traffic stays on without it", t);
+            removeLabels();
+        }
+    }
+
+    private void removeLabels() {
+        if (labelLayer != null) {
+            try {
+                mapView.removeLayer(MapView.RenderStack.RASTER_OVERLAYS, labelLayer);
+            } catch (Throwable t) {
+                Log.w(TAG, "removing labels layer failed", t);
+            }
+            labelLayer = null;
+        }
+        if (labelStore != null) {
+            try {
+                labelStore.clear();
+                labelStore.dispose();
+            } catch (Throwable t) {
+                Log.w(TAG, "disposing labels store failed", t);
+            }
+            labelStore = null;
+        }
+    }
+
     /** Take the overlay down and stop the heartbeat. Safe to call when already off. */
     public void turnOff() {
         stopHeartbeat();
         unwatchScreen();
+        removeLabels();
         if (layer != null) {
             try {
                 mapView.removeLayer(MapView.RenderStack.RASTER_OVERLAYS, layer);
@@ -574,15 +638,15 @@ public class LiveOverlay {
      * are still read through the plugin context — that part works — but nothing may be
      * written there.
      */
-    private File stageAsset(Source src) {
+    private File stageAsset(String asset) {
         java.io.InputStream in = null;
         java.io.OutputStream out = null;
         try {
             final File dir = new File(hostContext().getCacheDir(), "traffic");
             if (!dir.exists() && !dir.mkdirs())
                 return null;
-            final File dest = new File(dir, new File(src.asset).getName());
-            in = pluginContext.getAssets().open(src.asset);
+            final File dest = new File(dir, new File(asset).getName());
+            in = pluginContext.getAssets().open(asset);
             out = new java.io.FileOutputStream(dest);
             final byte[] buf = new byte[8192];
             int n;
@@ -591,7 +655,7 @@ public class LiveOverlay {
             out.flush();
             return dest;
         } catch (Throwable t) {
-            Log.e(TAG, "staging " + src.asset + " failed", t);
+            Log.e(TAG, "staging " + asset + " failed", t);
             return null;
         } finally {
             close(in);

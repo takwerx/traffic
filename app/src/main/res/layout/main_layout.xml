@@ -2,11 +2,26 @@
 <!-- Four controls and a status line. The complaint that started this plugin was
      "is it actually live?", so the status line is not decoration: without it the
      answer is unavailable. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- A ScrollView since 0.7: the 511 row made the pane taller than half a phone screen. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="8dp">
+
+<!-- The main page. The 511 settings page below replaces it in place (IPAWS's
+     pattern), so everything set once and left stays off the controls used in the field. -->
+<LinearLayout
+    android:id="@+id/main_page"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/source_heading"
@@ -113,6 +128,59 @@
         android:paddingTop="12dp"
         android:textSize="13sp" />
 
+    <!-- 511: road incidents from the state DOTs and CHP, drawn as their own layer
+         beside the traffic tiles. Its own switch, its own settings, its own status. -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:paddingBottom="4dp"
+        android:text="@string/incidents_heading"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            style="@style/TakwerxButton"
+            android:id="@+id/btn_incidents"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="56dp"
+            android:text="@string/state_off_label" />
+
+        <Button
+            style="@style/TakwerxButton"
+            android:id="@+id/btn_incidents_settings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:minHeight="56dp"
+            android:text="@string/settings" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/status_incidents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:textSize="13sp" />
+
+    <!-- "Add Nebraska": shown only when the map is over a state we publish that is
+         not one of theirs. One tap, no trip to Settings. -->
+    <Button
+        style="@style/TakwerxButton"
+        android:id="@+id/btn_incidents_add_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/note"
         android:layout_width="match_parent"
@@ -121,3 +189,200 @@
         android:text="@string/overlay_note"
         android:textSize="11sp" />
 </LinearLayout>
+
+<!-- The 511 settings page: zoom gate, then one switch per type. -->
+<LinearLayout
+    android:id="@+id/incidents_page"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <Button
+        style="@style/TakwerxButton"
+        android:id="@+id/btn_incidents_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/back" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.6"
+        android:paddingTop="10dp"
+        android:text="@string/incidents_settings_heading"
+        android:textAllCaps="true"
+        android:textSize="10sp" />
+
+    <!-- The states they follow; the list of every state we publish opens from it. -->
+    <Button
+        android:id="@+id/btn_states"
+        style="@style/TakwerxButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/fold_gate_head"
+            style="@style/TakwerxButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/fold_gate_chev"
+            style="@style/TakwerxIconButton"
+            android:layout_width="44dp"
+            android:layout_weight="0"
+            android:layout_marginRight="0dp"
+            android:contentDescription="@string/show_settings"
+            android:src="@drawable/ic_expand" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fold_gate_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="4dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btn_use_zoom"
+            style="@style/TakwerxButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/use_this_zoom" />
+
+        <Button
+            android:id="@+id/btn_gate"
+            style="@style/TakwerxButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <!-- Area: what is in view, or a radius around me or the map center (IPAWS's). -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/fold_scope_head"
+            style="@style/TakwerxButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/fold_scope_chev"
+            style="@style/TakwerxIconButton"
+            android:layout_width="44dp"
+            android:layout_weight="0"
+            android:layout_marginRight="0dp"
+            android:contentDescription="@string/show_settings"
+            android:src="@drawable/ic_expand" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fold_scope_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/scope_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+        <SeekBar
+            android:id="@+id/scope_seek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="50"
+            android:minHeight="44dp" />
+
+        <Button
+            android:id="@+id/btn_scope_from"
+            style="@style/TakwerxButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_scope_extent"
+                style="@style/TakwerxButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/use_this_extent" />
+
+            <Button
+                android:id="@+id/btn_scope_presets"
+                style="@style/TakwerxButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_weight="1"
+                android:text="@string/presets" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/fold_types_head"
+            style="@style/TakwerxButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/fold_types_chev"
+            style="@style/TakwerxIconButton"
+            android:layout_width="44dp"
+            android:layout_weight="0"
+            android:layout_marginRight="0dp"
+            android:contentDescription="@string/show_settings"
+            android:src="@drawable/ic_expand" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fold_types_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/types_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </LinearLayout>
+</LinearLayout>
+</LinearLayout>
+</ScrollView>

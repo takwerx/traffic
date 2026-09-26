@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Google's highway labels alone: interstate, US and state route shields and
+     highway names, on a transparent tile, drawn above the traffic colors.
+     Without it the traffic line covers the base map's own shield, which is the one
+     thing on the road an operator reads (operator, 2026-09-26).
+     The apistyle turns every geometry off, then the labels of everything that is
+     not a road (administrative, points of interest, transit, landscape, water),
+     local-road labels, and arterial label text, leaving highway labels and the
+     route shields that sit on arterials. Measured on LA and Minneapolis tiles at
+     z9, z11, z12 and z15: shields only. No tileUpdate: labels do not change. -->
+<customMapSource>
+    <name>Traffic Highway Labels</name>
+    <minZoom>0</minZoom>
+    <maxZoom>20</maxZoom>
+    <tileType>png</tileType>
+    <url>https://mt1.google.com/vt?lyrs=h&amp;hl=en-US&amp;src=apiv4&amp;x={$x}&amp;y={$y}&amp;z={$z}&amp;s=Gal&amp;apistyle=s.e%3Ag%7Cp.v%3Aoff%2Cs.t%3A1%7Cs.e%3Al%7Cp.v%3Aoff%2Cs.t%3A2%7Cs.e%3Al%7Cp.v%3Aoff%2Cs.t%3A4%7Cs.e%3Al%7Cp.v%3Aoff%2Cs.t%3A5%7Cs.e%3Al%7Cp.v%3Aoff%2Cs.t%3A6%7Cs.e%3Al%7Cp.v%3Aoff%2Cs.t%3A51%7Cs.e%3Al%7Cp.v%3Aoff%2Cs.t%3A50%7Cs.e%3Al.t%7Cp.v%3Aoff</url>
+    <backgroundColor>#00000000</backgroundColor>
+</customMapSource>
