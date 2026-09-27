@@ -109,6 +109,8 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
     private Button incidentsAddState;
     private View mainPage;
     private View incidentsPage;
+    /** Where the main page was scrolled when the settings page replaced it. */
+    private int mainScrollY;
     private IncidentSettings incidentSettings;
 
     private final SimpleDateFormat clock =
@@ -497,8 +499,32 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
             return;
         if (show)
             incidentSettings.refresh();
+        // Both pages share one scroller, so the settings page opened wherever the
+        // main page had been scrolled to: Back and States off the top (S22,
+        // 2026-09-26). Open it at the top; Back returns to where the main page was.
+        final android.widget.ScrollView scroller = scrollerOf(mainPage);
+        if (show && scroller != null)
+            mainScrollY = scroller.getScrollY();
         mainPage.setVisibility(show ? View.GONE : View.VISIBLE);
         incidentsPage.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (scroller != null) {
+            final int y = show ? 0 : mainScrollY;
+            scroller.post(new Runnable() {
+                @Override
+                public void run() {
+                    scroller.scrollTo(0, y);
+                }
+            });
+        }
+    }
+
+    /** The scroll view holding a page, or null. */
+    private static android.widget.ScrollView scrollerOf(View v) {
+        for (android.view.ViewParent p = v == null ? null : v.getParent(); p != null;
+                p = p.getParent())
+            if (p instanceof android.widget.ScrollView)
+                return (android.widget.ScrollView) p;
+        return null;
     }
 
     private void rememberIncidents(boolean on) {
@@ -554,7 +580,21 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
         // hides most of the map is a choice they should not have to remember making.
         final String where = incidents.isRadius()
                 ? IncidentSettings.scopeText(incidents) : incidents.shownNames();
-        return pluginContext.getString(R.string.incidents_checked_fmt, where, checked);
+        final String line = pluginContext.getString(R.string.incidents_checked_fmt, where,
+                checked);
+        // Over a state they do not follow while one they do is still near: say so
+        // under the line, and the Add button below offers it.
+        return offersState() ? line + "\n" + pluginContext.getString(
+                R.string.incidents_not_picked_fmt, incidents.suggestedStateName()) : line;
+    }
+
+    /** The pane offers to add the state under the map: shown or not-picked, never gated. */
+    private boolean offersState() {
+        if (incidents == null || !incidents.isOn() || incidents.isGatedOut()
+                || !incidents.everReached() || incidents.suggestedState() == null)
+            return false;
+        final IncidentFeed.Coverage c = incidents.coverage();
+        return c == IncidentFeed.Coverage.NOT_PICKED || c == IncidentFeed.Coverage.SHOWN;
     }
 
     private static android.content.SharedPreferences prefs() {
@@ -656,8 +696,7 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
         if (incidentsStatus != null)
             incidentsStatus.setText(incidentsLine());
         if (incidentsAddState != null) {
-            final boolean offer = incidentsOn && incidents.coverage() == IncidentFeed.Coverage.NOT_PICKED
-                    && incidents.suggestedState() != null;
+            final boolean offer = offersState();
             incidentsAddState.setVisibility(offer ? View.VISIBLE : View.GONE);
             if (offer)
                 incidentsAddState.setText(pluginContext.getString(

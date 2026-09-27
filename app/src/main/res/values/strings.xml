@@ -3,7 +3,7 @@
     <!-- App -->
     <string name="app_name">Traffic</string>
     <!-- description -->
-    <string name="app_desc">Live traffic drawn over your own base map, and kept refreshing while the map sits still.</string>
+    <string name="app_desc">Live traffic and road incidents drawn over your own base map, kept current while the map sits still.</string>
 
     <string name="source_heading">Source</string>
     <string name="source_none">Choose a source</string>
@@ -19,7 +19,7 @@
     <string name="woke_fmt">Refreshed on wake at %1$s</string>
     <string name="prefs_summary">Open the Traffic user guide</string>
     <string name="manual_title">Plugin Documentation</string>
-    <string name="manual_summary">Open the Traffic user guide: turning the overlay on, what the markers mean, and how the feed refreshes</string>
+    <string name="manual_summary">Open the Traffic user guide: the traffic overlay, road incidents from every state, and how both stay current</string>
     <string name="traffic_heading">Traffic Overlay</string>
     <string name="persist_heading">Persistent Overlay</string>
     <string name="state_on_label">ON</string>

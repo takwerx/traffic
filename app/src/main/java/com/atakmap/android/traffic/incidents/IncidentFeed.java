@@ -162,6 +162,8 @@ public class IncidentFeed {
     /** A published state in view that is not one of theirs, for "Add Nebraska". */
     private volatile String suggestCode;
     private volatile String suggestName;
+    /** State outlines for naming the state under the map; loaded on first use. */
+    private StateOutlines outlines;
     /** Every state we publish, code to name, in the index's order. */
     private volatile Map<String, String> published = Collections.emptyMap();
     /** What is on the map now, by the incident's own id. Replaced whole, never edited. */
@@ -758,10 +760,17 @@ public class IncidentFeed {
         // naming the one under the middle of the map when there is one.
         final Set<String> notPicked = new LinkedHashSet<>(inView);
         notPicked.removeAll(picked);
+        // The state under the middle of the map is offered whenever it is not one of
+        // theirs, even while a picked state's padded box still meets the view: over
+        // Las Vegas, California's box did, and Nevada was never offered (S22,
+        // 2026-09-26). With nothing picked in view, any state in view will do.
         String suggest = null;
-        if (!everything && !notPicked.isEmpty()) {
+        if (!everything) {
             final String mid = stateAt(scopeRef != null ? scopeRef : centerOf(view));
-            suggest = mid != null && notPicked.contains(mid) ? mid : notPicked.iterator().next();
+            if (mid != null && !picked.contains(mid))
+                suggest = mid;
+            else if (want.isEmpty() && !notPicked.isEmpty())
+                suggest = notPicked.iterator().next();
         }
         suggestCode = suggest;
         suggestName = suggest == null ? null : stateName(suggest);
@@ -859,12 +868,24 @@ public class IncidentFeed {
     }
 
     /**
-     * The published state whose box holds this point; the smallest box wins, because
-     * the boxes are padded and overlap along every border.
+     * The published state this point is in: by the state outlines shipped in the
+     * plugin, else by the published boxes, where the smallest box wins because the
+     * boxes are padded and overlap along every border. Worker thread (it reads an
+     * asset the first time).
      */
     private String stateAt(double[] p) {
         if (p == null)
             return null;
+        if (outlines == null)
+            outlines = StateOutlines.load(pluginContext);
+        if (!outlines.isEmpty()) {
+            final List<String> codes = new ArrayList<>(index.size());
+            for (StateInfo st : index)
+                codes.add(st.code);
+            final String code = outlines.stateAt(p[0], p[1], codes);
+            if (code != null)
+                return code;
+        }
         StateInfo best = null;
         double bestArea = Double.MAX_VALUE;
         for (StateInfo st : index) {

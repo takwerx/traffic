@@ -40,3 +40,6 @@ dist/
 
 # Built by gradle/typst.gradle into the source tree; tak.gov builds its own
 app/src/main/assets/usermanual.pdf
+
+# Full-screen frames the screenshots are cropped from; local only.
+docs/screenshots/raw/
