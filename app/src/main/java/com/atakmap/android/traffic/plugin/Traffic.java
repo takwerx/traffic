@@ -65,6 +65,8 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
      */
     private IncidentFeed incidents;
     private IncidentDetails incidentDetails;
+    /** Answers ATAK before it opens a radial on a 511 icon; see {@link #registerTap}. */
+    private com.atakmap.android.menu.MapMenuEventListener menuListener;
 
     /** What the source button offers. Order is the order they are shown. */
     private final List<LiveOverlay.Source> sources = new ArrayList<>();
@@ -443,6 +445,7 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
                 new AtakBroadcast.DocumentedIntentFilter();
         filter.addAction(IncidentDetails.ACTION);
         AtakBroadcast.getInstance().registerReceiver(incidentDetails, filter);
+        registerTap(mapView);
 
         // 511 comes back the way it was left, across ATAK restarts and plugin updates,
         // with no separate opt-in (operator, 2026-09-26: "should stay on persistent
@@ -455,7 +458,62 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
         }
     }
 
+    /**
+     * A tap on a 511 icon opens its details in the pane, no radial (operator,
+     * 2026-11-05). The radial's only reading button was Details, so it was a step in
+     * the way; Bloodhound and range and bearing are still on ATAK's own tools.
+     *
+     * <p>ATAK asks this listener before it opens a radial; answering true stops the
+     * radial and tells ATAK the tap was handled, so no callout is left pinned to the
+     * map after Back (AirAware, 2026-10-09). Only our own items are claimed. The page
+     * opens a quarter second later because a pick from ATAK's Select Item list posts
+     * its own show-details, which would close a page opened inline. It goes through
+     * the same broadcast the radial's Details sent, so a tap, the radial (the
+     * fallback when there is no menu receiver) and the list reach one page.
+     */
+    private void registerTap(final MapView mapView) {
+        menuListener = new com.atakmap.android.menu.MapMenuEventListener() {
+            @Override
+            public boolean onShowMenu(final com.atakmap.android.maps.MapItem item) {
+                if (item == null || incidentDetails == null
+                        || item.getMetaString("traffic_incident", null) == null)
+                    return false;
+                final String uid = item.getUID();
+                mapView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        final AtakBroadcast b = AtakBroadcast.getInstance();
+                        b.sendBroadcast(new android.content.Intent(
+                                "com.atakmap.android.maps.UNFOCUS"));
+                        b.sendBroadcast(new android.content.Intent(
+                                "com.atakmap.android.maps.HIDE_DETAILS"));
+                        b.sendBroadcast(new android.content.Intent(IncidentDetails.ACTION)
+                                .putExtra("targetUID", uid));
+                    }
+                }, 250);
+                return true;
+            }
+
+            @Override
+            public void onHideMenu(com.atakmap.android.maps.MapItem item) {
+            }
+        };
+        final com.atakmap.android.menu.MapMenuReceiver menus =
+                com.atakmap.android.menu.MapMenuReceiver.getInstance();
+        if (menus != null)
+            menus.addEventListener(menuListener);
+        else
+            Log.w(TAG, "no radial menu receiver; 511 taps keep the radial");
+    }
+
     private void stopIncidents() {
+        if (menuListener != null) {
+            final com.atakmap.android.menu.MapMenuReceiver menus =
+                    com.atakmap.android.menu.MapMenuReceiver.getInstance();
+            if (menus != null)
+                menus.removeEventListener(menuListener);
+            menuListener = null;
+        }
         if (incidentDetails != null) {
             incidentDetails.closeIfOpen();
             if (incidents != null)
