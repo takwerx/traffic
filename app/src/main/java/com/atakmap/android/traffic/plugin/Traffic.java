@@ -3,12 +3,9 @@ package com.atakmap.android.traffic.plugin;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -769,15 +766,17 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
         refreshButton.setEnabled(on || incidentsOn);
         intervalButton.setEnabled(on);
 
+        // The Traffic Overlay button already says ON or OFF; a second big state word
+        // under it said the same thing again (operator, 2026-11-05). Off, the line is
+        // gone; on, it carries only the refresh detail.
         if (!on) {
-            status.setText(state(R.string.state_off, R.color.state_off));
+            status.setVisibility(View.GONE);
             return;
         }
+        status.setVisibility(View.VISIBLE);
 
         final long every = overlay.getIntervalMs() / 1000L;
-        final SpannableStringBuilder sb =
-                new SpannableStringBuilder(state(R.string.state_on, R.color.state_on));
-        sb.append("\n");
+        final SpannableStringBuilder sb = new SpannableStringBuilder();
         if (overlay.isHoldingForScreen())
             sb.append("Holding while the screen is off; refreshes on wake.\n");
         else
@@ -805,24 +804,6 @@ public class Traffic implements IPlugin, LiveOverlay.Listener, IncidentFeed.List
             sb.append("Waiting for the first tiles…");
         }
         status.setText(sb);
-    }
-
-    /**
-     * The state word, in its colour and larger than the detail beneath it.
-     *
-     * ON and OFF are what the operator reads first and often the only thing they read, so
-     * the word carries the answer by itself rather than needing the sentence after it.
-     */
-    private CharSequence state(int wordRes, int colorRes) {
-        final SpannableStringBuilder s =
-                new SpannableStringBuilder(pluginContext.getString(wordRes));
-        final int end = s.length();
-        s.setSpan(new ForegroundColorSpan(
-                        pluginContext.getResources().getColor(colorRes)),
-                0, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        s.setSpan(new StyleSpan(Typeface.BOLD), 0, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        s.setSpan(new RelativeSizeSpan(1.4f), 0, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return s;
     }
 
     private void say(String message) {
