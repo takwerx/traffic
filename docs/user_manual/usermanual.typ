@@ -70,7 +70,7 @@ ON in green or OFF in red.
 #v(4pt)
 
 *Refresh now* fetches at once; *Interval* sets how often it refreshes on its
-own. The line under them says when tiles last arrived.
+own. While traffic is on, the line under them says when tiles last arrived.
 
 #v(4pt)
 
@@ -283,24 +283,14 @@ map is never a surprise.
 #tak-slide[
 = Tapping an incident
 
-#toolbox.side-by-side(columns: (7fr, 5fr))[
-  #image("13.jpg", height: 9.6cm)
-][
-Tap an icon and its title shows above it with the menu around it. The list
-item at the bottom opens its details.
-
-#v(6pt)
-
-Where icons sit on top of each other, ATAK first asks which one you meant.
-]
-]
-
-#tak-slide[
-= What the details say
-
 #toolbox.side-by-side(columns: (8fr, 4fr))[
   #image("14.jpg", width: 100%)
 ][
+Tap an icon and its details open in the side pane. Where icons sit on top of
+each other, ATAK first asks which one you meant.
+
+#v(4pt)
+
 The type, a short title, where, and when it was reported and last updated.
 
 #v(4pt)

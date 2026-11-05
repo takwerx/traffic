@@ -81,9 +81,9 @@ Tap the Traffic icon in the ATAK toolbar.
 - **511 Incidents** turns the incident icons on and off; they remember on or off
   by themselves. **Settings** opens their page.
 
-Each switch reads **ON** in green or **OFF** in red. The line under each part
-says what it is doing: when traffic tiles last arrived, and which states'
-incidents were last checked and when.
+Each switch reads **ON** in green or **OFF** in red. While a part is on, the
+line under it says what it is doing: when traffic tiles last arrived, and which
+states' incidents were last checked and when.
 
 ### Step 3 — How often traffic refreshes
 
@@ -162,11 +162,8 @@ so, so a hidden part of the map is never a surprise.
 
 ### Step 8 — Tap an incident
 
-![The radial menu around a crash, its title above it](screenshots/12_radial.png)
-
-Tap an icon: its title shows above it with the menu around it. The list item at
-the bottom opens the details. Where icons sit on top of each other, ATAK first
-asks which one you meant.
+Tap an icon and its details open in the side pane. Where icons sit on top of
+each other, ATAK first asks which one you meant.
 
 ![A California Highway Patrol crash: title, place, reported and updated times, and the units timeline](screenshots/13_crash_details.png)
 
