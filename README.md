@@ -69,6 +69,12 @@ Road incidents (511), new in 0.7:
 _________________________________________________________________
 STATUS
 
+Version 0.9: a tap on a 511 icon opens its details in the side pane, with no
+radial menu in between, and the Traffic Overlay status line no longer repeats
+the ON/OFF the button already shows. Verified as tak.gov-signed builds on
+official ATAK-CIV 5.6.0.18, 5.7.0.5 and 5.8.0.5 (Samsung Galaxy S9+), and as a
+release build on 5.8.0.3 (dev build) on a Samsung Galaxy S10.
+
 Version 0.8: road incidents from all 50 states (see PURPOSE AND CAPABILITIES),
 and highway shields above the traffic colors. The pane offers to add the state
 under the map even where a picked state is close by, and the incident settings
