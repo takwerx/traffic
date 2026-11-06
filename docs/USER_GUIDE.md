@@ -1,12 +1,12 @@
 # Traffic for ATAK — User Guide
 
-**Version 0.8 · takwerx**
+**Version 0.9 · takwerx**
 
-**Download Traffic 0.8** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
+**Download Traffic 0.9** (pick the one matching your ATAK-CIV version, sideload, then load it in ATAK's Plugins manager):
 
-- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.8/ATAK-Plugin-Traffic-0.8--5.6.0-civ-release.apk
-- **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.8/ATAK-Plugin-Traffic-0.8--5.7.0-civ-release.apk
-- **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.8/ATAK-Plugin-Traffic-0.8--5.8.0-civ-release.apk
+- **ATAK-CIV 5.6:** https://github.com/takwerx/traffic/releases/download/v0.9/ATAK-Plugin-Traffic-0.9--5.6.0-civ-release.apk
+- **ATAK-CIV 5.7:** https://github.com/takwerx/traffic/releases/download/v0.9/ATAK-Plugin-Traffic-0.9--5.7.0-civ-release.apk
+- **ATAK-CIV 5.8:** https://github.com/takwerx/traffic/releases/download/v0.9/ATAK-Plugin-Traffic-0.9--5.8.0-civ-release.apk
 
 All releases: https://github.com/takwerx/traffic/releases
 
