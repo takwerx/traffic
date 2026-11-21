@@ -17,6 +17,10 @@ concurrency:
   group: claude-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
   cancel-in-progress: false
 
+# Read-only by default (ops #1014); each job below asks for what it needs.
+permissions:
+  contents: read
+
 jobs:
   claude:
     if: github.event_name != 'workflow_dispatch' && contains(github.event.comment.body, '@claude') && !(github.event.comment.user.login == 'takwerx' && contains(github.event.comment.body, 'ship it'))
@@ -29,12 +33,12 @@ jobs:
       id-token: write
       actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - name: Where the worker's settings live on this runner
         run: echo "TAK_WORKER_DIR=$HOME/tak-agent/workers" >> "$GITHUB_ENV"
-      - uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-action@f3b070c88125d33dbae5653df5f143101d4ea9dc # v1.0.276
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: >-
@@ -52,10 +56,10 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Where the worker's settings live on this runner
         run: echo "TAK_WORKER_DIR=$HOME/tak-agent/workers" >> "$GITHUB_ENV"
-      - uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-action@f3b070c88125d33dbae5653df5f143101d4ea9dc # v1.0.276
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: ${{ inputs.task }}

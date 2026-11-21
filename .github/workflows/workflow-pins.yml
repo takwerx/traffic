@@ -1,0 +1,26 @@
+name: Workflow pins
+
+# ops #1014: keeps the workflow files safe. Every action pinned to a full commit SHA, a read-only
+# default token, and the two security scans (CodeQL, Scorecard) keep their shape.
+# Run it locally: python3 -I .github/ci/test_workflow_pins.py
+# NOT a required check. Hosted runner, no secrets.
+on:
+  pull_request:
+    paths: ['.github/**']
+  push:
+    branches: [main]
+    paths: ['.github/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workflow-pins:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - run: python3 -I .github/ci/test_workflow_pins.py
