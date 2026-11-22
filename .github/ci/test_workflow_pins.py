@@ -124,6 +124,25 @@ def check_scorecard(text):
     return p
 
 
+def check_repo_hygiene():
+    """SECURITY.md says how to report privately; Dependabot keeps the pinned actions current (ops #1014 step 4)."""
+    p = []
+    sec = [f for f in (ROOT / 'SECURITY.md', ROOT / '.github' / 'SECURITY.md', ROOT / 'docs' / 'SECURITY.md')
+           if f.is_file()]
+    if not sec:
+        p.append('no SECURITY.md (how to report a vulnerability privately)')
+    else:
+        t = sec[0].read_text(encoding='utf-8').lower()
+        if 'takwerx@gmail.com' not in t and 'security/advisories' not in t:
+            p.append('SECURITY.md names no private way to report (email or the Security tab)')
+    dep = [f for f in (ROOT / '.github' / 'dependabot.yml', ROOT / '.github' / 'dependabot.yaml') if f.is_file()]
+    if not dep:
+        p.append('no .github/dependabot.yml')
+    elif 'github-actions' not in dep[0].read_text(encoding='utf-8'):
+        p.append('dependabot.yml must cover the github-actions ecosystem (it keeps the SHA pins current)')
+    return p
+
+
 def check_hosted_and_quiet(name, text):
     t = _code(text)
     p = []
@@ -168,6 +187,7 @@ def run_all():
         problems += check_top_permissions(name, t)
     if PR_CHECKS.is_file():  # not every repo has a checks-ok gate
         problems += check_not_required(PR_CHECKS.read_text(encoding='utf-8'))
+    problems += check_repo_hygiene()
     return problems
 
 
